@@ -35,7 +35,7 @@ struct Page1 : View {
             }
             Spacer()
             Image("page1")
-            Spacer()
+            Spacer(minLength: 65)
             VStack(spacing: 16){
                 Button(action: {
                     withAnimation(.easeInOut){
@@ -43,10 +43,13 @@ struct Page1 : View {
                     }
                 }, label: {
                     OnBoardingButton(text: "Add a new vehicle", textColor: Palette.white, color: Palette.black)
+                        
                 })
-                OnBoardingButton(text: "Import data", textColor: Palette.black, color: Palette.white)
-                OnBoardingButton(text: "Restore from iCloud", textColor: Palette.black, color: Palette.white)
+               
+//                OnBoardingButton(text: "Import data", textColor: Palette.black, color: Palette.white)
+//                OnBoardingButton(text: "Restore from iCloud", textColor: Palette.black, color: Palette.white)
             }
+            Spacer()
             
         }.background(Palette.greyBackground)
     }
@@ -175,7 +178,7 @@ struct Page2 : View {
                     }
                     .accentColor(Palette.black)
                 })
-                .confirmationDialog("Select a fuel type", isPresented: $showDefaultFuel, titleVisibility: .visible){
+                .confirmationDialog(String(localized: "Select a fuel type"), isPresented: $showDefaultFuel, titleVisibility: .visible){
                     ForEach(FuelType.allCases.reversed(), id: \.self) { fuel in
                         Button(fuel.label){
                             fuelVM.defaultFuelType = fuel
@@ -218,6 +221,7 @@ struct Page3 : View {
     var dataVM = DataViewModel()
     @StateObject var onboardingVM : OnboardingViewModel
     @StateObject var fuelVM : FuelViewModel
+    @ObservedObject var categoryVM : CategoryViewModel
     
     var body: some View {
         ZStack{
@@ -356,7 +360,7 @@ struct Page3 : View {
                         }, label: {
                             OnBoardingCard(text: "Second fuel type", bgColor: Palette.colorYellow, iconName:  "fuel")
                         })
-                        .confirmationDialog("Select a fuel type", isPresented: $onboardingVM.showAllFuels, titleVisibility: .visible){
+                        .confirmationDialog(String(localized: "Select a fuel type"), isPresented: $onboardingVM.showAllFuels, titleVisibility: .visible){
                             ForEach(FuelType.allCases.reversed(), id: \.self) { fuel in
                                 Button(fuel.label){
                                     fuelVM.secondaryFuelType = fuel
@@ -394,6 +398,7 @@ struct Page3 : View {
                         onboardingVM.vehicle.current = 1
                         dataVM.addVehicle(vehicle: onboardingVM.vehicle)
                         fuelVM.resetSelectedFuel()
+                        categoryVM.retrieveAndUpdate(vehicleID: dataVM.currentVehicle.first!.vehicleID)
                         onboardingVM.addNewVehicle = false
                     }, label: {
                         OnBoardingButton(text: "Add vehicle", textColor: Palette.white, color: Palette.black)
@@ -458,7 +463,7 @@ struct Page4 : View {
             
             Spacer()
             VStack(spacing:12){
-                Text("Don’t miss anything \n important")
+                Text("Don’t miss anything \nimportant")
                     .font(Typography.headerXL)
                     .multilineTextAlignment(.center)
                     .foregroundColor(Palette.black)
@@ -537,7 +542,7 @@ struct Page5 : View {
                         onboardingVM.resetFields()
                     }
                 }, label: {
-                    OnBoardingButton(text: "Add new car", textColor: Palette.black, color: Palette.white)
+                    OnBoardingButton(text: "Add a new vehicle", textColor: Palette.black, color: Palette.white)
                 })
             }
             
@@ -547,7 +552,7 @@ struct Page5 : View {
 
 struct OnBoardingButton : View {
     
-    var text : String
+    var text : LocalizedStringKey
     var textColor : Color
     var color : Color
     
@@ -570,7 +575,7 @@ struct OnBoardingButton : View {
 
 struct OnBoardingCard : View {
     
-    var text : String
+    var text : LocalizedStringKey
     var bgColor : Color
     var iconName : String
     

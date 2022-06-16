@@ -15,7 +15,7 @@ struct BottomContentView: View {
     @ObservedObject var utilityVM : UtilityViewModel
     @ObservedObject var categoryVM : CategoryViewModel
     @StateObject var pdfVM = PdfViewModel()
-    
+        
     @State private var viewAllNumbers = false
     @State private var viewAllDocuments = false
     @State private var viewAllEvents = false
@@ -38,7 +38,7 @@ struct BottomContentView: View {
             
             if(dataVM.expenseList.isEmpty){
                 HStack{
-                    Text("There are no events now")
+                    Text(LocalizedStringKey("There are no events to show"))
                         .font(Typography.TextM)
                         .foregroundColor(Palette.greyMiddle)
                     Spacer()
@@ -60,8 +60,12 @@ struct BottomContentView: View {
             }
             
             //MARK: DOCUMENTS
-            TitleSectionComponent(sectionTitle: "Documents", binding: $viewAllDocuments)
-                .padding()
+            HStack{
+                Text("Documents")
+                    .foregroundColor(Palette.black)
+                    .font(Typography.headerL)
+                Spacer()
+            }                .padding()
                 .padding(.top,10)
                 .padding(.bottom,-10)
             
@@ -73,6 +77,7 @@ struct BottomContentView: View {
                             Button(action: {
                                 showPDF.toggle()
                                 pdfVM.documentState = DocumentState.fromDocumentViewModel(vm: document)
+                                pdfVM.loadBookmark()
                             }, label: {
                                 documentComponent(title: document.title)
                             })
@@ -90,9 +95,8 @@ struct BottomContentView: View {
                     switch result {
                     case .success(let url):
                         if url.startAccessingSecurityScopedResource() {
-                            pdfVM.documentState.url = url
                             pdfVM.documentState.title = url.lastPathComponent.replacingOccurrences(of: ".pdf", with: "")
-                            dataVM.addDocument(documentS: pdfVM.documentState)
+                            dataVM.addDocument(documentS: pdfVM.documentState,url: url)
                         }
                         url.stopAccessingSecurityScopedResource()
                     case .failure(let error):
@@ -134,7 +138,7 @@ struct BottomContentView: View {
                                 }
                             }
                         }, label: {
-                            addComponent(title: "Add contact")
+                            addComponent(title:"Add contact")
                         })
                         
                     }
@@ -242,7 +246,7 @@ struct BottomContentView: View {
     }
     
     @ViewBuilder
-    func addComponent(title : String) -> some View {
+    func addComponent(title : LocalizedStringKey) -> some View {
         ZStack{
             Rectangle()
                 .cornerRadius(8)
@@ -311,7 +315,7 @@ struct CategoryComponent : View {
 
 struct TitleSectionComponent : View {
     
-    var sectionTitle : String
+    var sectionTitle : LocalizedStringKey
     @Binding var binding : Bool
     
     

@@ -13,39 +13,16 @@ struct Graph: View {
     var body: some View {
         VStack {
                 //if tab is fuel
-            
-            
+            if !categoryVM.fuelGraphData.isEmpty {
                 //if tab is odometer
                 OdometerGraphView(data: sampleData)
                     .frame(height: 200)
                     .padding(.top, 25)
-//                    .overlay(
-//                        VStack {
-//                            HStack {
-//                                VStack(alignment: .leading) {
-//                                    Text("500")
-//                                    Spacer()
-//                                    Text("450")
-//                                    Text("350")
-//                                    Text("250")
-//                                    Text("150")
-//                                    Spacer()
-//                                    Text("0")
-//                                }
-//                                Spacer()
-//                            }
-//                            HStack(alignment: .bottom) {
-//                                Text("Dec")
-//                                Text("Jan")
-//                                Text("Feb")
-//                                Text("Mar")
-//                                Text("Apr")
-//                                Text("May")
-//                                Text("Jun")
-//                            }
-//                        }
-//                            .foregroundColor(Palette.greyMiddle)
-//                    )
+            } else {
+                ProgressView()
+            }
+            
+           
         }
     }
 }
@@ -162,7 +139,7 @@ struct FuelGraphView: View {
                         
                         let index = max(min(Int((translation / width).rounded() + 1), data.count - 1), 0)
                         
-                        currentPlot = "$ \(data[index])"
+                        currentPlot = "L \(data[index])"
                         self.translation = translation
                         
                         offset = CGSize(width: points[index].x - 40, height: points[index].y - height)
@@ -173,9 +150,6 @@ struct FuelGraphView: View {
             }
             .overlay(
                 VStack(alignment: .leading) {
-//                    var newData = data.map { data in
-//                        return data * 100
-//                    }
                     let  max = data.max() ?? 0
 
                     Text("L \(Int(max))")
@@ -326,7 +300,7 @@ struct OdometerGraphView: View {
                         
                         let index = max(min(Int((translation / width).rounded() + 1), data.count - 1), 0)
                         
-                        currentPlot = "Km \(data[index])"
+                        currentPlot = "km \(data[index])"
                         self.translation = translation
                         
                         offset = CGSize(width: points[index].x - 40, height: points[index].y - height)

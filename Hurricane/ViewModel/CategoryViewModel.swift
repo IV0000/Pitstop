@@ -14,12 +14,12 @@ class CategoryViewModel: ObservableObject {
     
     @Published var categories = [Category2]()
     
-    @Published var currentPickerTab : String = "Overview"
+    @Published var currentPickerTab : String = String(localized: "Overview")
     
     @Published var arrayCat : [Category] = []
     
     @Published var selectedCategory : Int16 = Int16(Category.fuel.rawValue)
-    //Computed properties, pass expenseList through view and call functions
+   
     @Published var fuelTotal: Float = 0.0
     @Published var maintenanceTotal: Float = 0.0
     @Published var insuranceTotal: Float = 0.0
@@ -51,16 +51,16 @@ class CategoryViewModel: ObservableObject {
     
     @Published var currentOdometer: Double = 0
     @Published var odometerTimeTotal: Double = 0
-    @Published var avgOdometer: Float = 0
-    @Published var odometerTotal : Float = 0
-    @Published var estimatedOdometerPerYear : Float = 0
+    var avgOdometer: Float = 0
+    var odometerTotal : Float = 0
+    var estimatedOdometerPerYear : Float = 0
     var literDiff : Float = 0
     @Published var fuelEff : Float = 0
     
     @Published var taxesCost: Float = 0
     @Published var otherCost: Float = 0
     
-   
+    
     var fuelPercentage : Float = 0
     var taxesPercentage: Float = 0
     var maintainancePercentage : Float = 0
@@ -70,8 +70,8 @@ class CategoryViewModel: ObservableObject {
     var odometerGraphData : [CGFloat] = []
     
     
-    @Published var selectedTimeFrame = "Per month"
-    let timeFrames = ["Per month", "Per 3 months", "Per year" , "All time"]
+    @Published var selectedTimeFrame = String(localized: "Per month")
+    let timeFrames = [String(localized: "Per month" ), String(localized:"Per 3 months"), String(localized:"Per year") , String(localized:"All time")]
     
     
     
@@ -117,11 +117,11 @@ class CategoryViewModel: ObservableObject {
     
     func calculateTimeFrame(timeFrame: String) -> Int {
         var monthSub : Int {
-            if timeFrame == "Per month" {
+            if timeFrame == String(localized:"Per month") {
                 return -1
-            } else if timeFrame == "Per 3 months" {
+            } else if timeFrame == String(localized:"Per 3 months") {
                 return -3
-            } else if timeFrame == "Per year" {
+            } else if timeFrame == String(localized:"Per year") {
                 return -12
             } else {
                 return 0
@@ -132,11 +132,11 @@ class CategoryViewModel: ObservableObject {
     
     func calculateDays(timeFrame: String) -> Int {
         var Days : Int {
-            if timeFrame == "Per month" {
+            if timeFrame == String(localized:"Per month") {
                 return 30
-            } else if timeFrame == "Per 3 months" {
+            } else if timeFrame == String(localized:"Per 3 months") {
                 return 90
-            } else if timeFrame == "Per year" {
+            } else if timeFrame == String(localized:"Per year") {
                 return 365
             } else {
                 return 0
@@ -163,12 +163,17 @@ class CategoryViewModel: ObservableObject {
         let literArray = expenseListTime.map { expense in
             return expense.liters
         }
+        print("lierarray \(literArray)")
         let literSum = literArray.reduce(0, +)
         self.literDiff = literSum - Float(expenseListTime.last?.liters ?? 0.0)
         print("liter sum \(literSum)")
         let q = self.odometerTotal / 100
         print("q is \(q)")
-        self.fuelEff = literSum / q
+        if q != 0.0 {
+            self.fuelEff = literSum / q
+        } else {
+            self.fuelEff = q
+        }
         print("fuel efficiency \(self.fuelEff)")
         
         //self.odometerTotal
@@ -257,27 +262,23 @@ class CategoryViewModel: ObservableObject {
         let days = calculateDays(timeFrame: timeFrame)
         self.avgOdometer = odometerTotal / Float(days)
         
-        // prendi l'odometer dell ultima expense
-        //prendi odometer della prima expense nel time range
-        //sub
-        //dividi il risultato x i giorni
+    
     }
     
     //Estimated km/year takes odometer data from time frame, makes an average -> multiply for 12/ 4 / 1 based on time frame
     
     func getEstimatedOdometerPerYear(timeFrame: String) {
-//        let days = calculateDays(timeFrame: timeFrame)
+        //        let days = calculateDays(timeFrame: timeFrame)
         self.estimatedOdometerPerYear = self.avgOdometer * Float(365)
     }
     
-
+    
     
     func totalCostPercentage(totalCost: Float, expenseList: [ExpenseViewModel]) {
-        print("total cost is \(totalCost) and ")
+        
+        
         self.fuelPercentage = (self.fuelTotal / totalCost) * 100
-        print("fuel percentage is \(self.fuelPercentage)")
         self.taxesPercentage = ((self.insuranceTotal + self.roadTaxTotal + self.finesTotal + self.tollsTotal) / totalCost ) * 100
-        print("taxes percentage is \(self.taxesPercentage)")
         self.maintainancePercentage = (self.maintenanceTotal / totalCost) * 100
         self.otherPercentage = ((self.otherTotal + self.parkingTotal) / totalCost) * 100
         
@@ -306,7 +307,7 @@ class CategoryViewModel: ObservableObject {
         self.fuelGraphData = liters.map({ liter in
             return CGFloat(liter)
         })
-                
+        
     }
     
     func getOdometersData(expenses: [ExpenseViewModel]) {
@@ -346,19 +347,22 @@ class CategoryViewModel: ObservableObject {
         self.otherTotal = CategoryViewModel.totalCategoryCost(categoryList: self.otherList)
         
         
-        self.categories = [Category2(name: "Fuel", color: Palette.colorYellow, icon: "fuelType", totalCosts: self.fuelTotal),
-                                   Category2(name: "Maintenance", color: Palette.colorGreen, icon: "maintenance", totalCosts: self.maintenanceTotal),
-                                   Category2(name: "Insurance", color: Palette.colorOrange, icon: "insurance", totalCosts: self.insuranceTotal),
-                                   Category2(name: "Road Tax", color: Palette.colorOrange, icon: "roadTax", totalCosts: self.roadTaxTotal),
-                                   Category2(name: "Fines", color: Palette.colorOrange, icon: "fines", totalCosts: self.finesTotal),
-                                   Category2(name: "Tolls", color: Palette.colorOrange, icon: "Tolls", totalCosts: self.tollsTotal),
-                                   Category2(name: "Parking", color: Palette.colorViolet, icon: "parking", totalCosts: self.parkingTotal),
-                                   Category2(name: "Other", color: Palette.colorViolet, icon: "other", totalCosts: self.otherTotal)
-                ]
+        self.categories = [Category2(name: String(localized: "Fuel"), color: Palette.colorYellow, icon: "fuelType", totalCosts: self.fuelTotal),
+                           Category2(name: String(localized: "Maintenance"), color: Palette.colorGreen, icon: "maintenance", totalCosts: self.maintenanceTotal),
+                           Category2(name: String(localized: "Insurance"), color: Palette.colorOrange, icon: "insurance", totalCosts: self.insuranceTotal),
+                           Category2(name: String(localized: "Road tax"), color: Palette.colorOrange, icon: "roadTax", totalCosts: self.roadTaxTotal),
+                           Category2(name: String(localized: "Fines"), color: Palette.colorOrange, icon: "fines", totalCosts: self.finesTotal),
+                           Category2(name: String(localized: "Tolls"), color: Palette.colorOrange, icon: "Tolls", totalCosts: self.tollsTotal),
+                           Category2(name: String(localized: "Parking"), color: Palette.colorViolet, icon: "parking", totalCosts: self.parkingTotal),
+                           Category2(name: String(localized: "Other"), color: Palette.colorViolet, icon: "other", totalCosts: self.otherTotal)
+        ]
     }
     
     func retrieveAndUpdate(vehicleID: NSManagedObjectID) {
         self.expenseList = []
+        self.avgOdometer = 0
+        self.odometerTotal = 0
+        self.estimatedOdometerPerYear = 0
         let filterCurrentExpense = NSPredicate(format: "vehicle = %@", (vehicleID))
         self.getExpensesCoreData(filter: filterCurrentExpense, storage:  { storage in
             self.expenseList = storage
@@ -368,11 +372,12 @@ class CategoryViewModel: ObservableObject {
             if self.fuelList.count >= 2 {
                 self.getAverageOdometer(expenseList: self.expenseList, timeFrame: self.selectedTimeFrame)
                 self.getEstimatedOdometerPerYear(timeFrame: self.selectedTimeFrame)
-                self.getFuelEfficiency(timeFrame: self.selectedTimeFrame, fuelList: self.fuelList)
+                
                 self.getAverageDaysRefuel(timeFrame: self.selectedTimeFrame, fuelList: self.fuelList)
                 self.getAveragePrice(timeFrame: self.selectedTimeFrame, fuelList: self.fuelList)
-               
+                
             }
+            self.getFuelEfficiency(timeFrame: self.selectedTimeFrame, fuelList: self.fuelList)
             self.getTotalExpense(expenses: self.expenseList)
             self.totalCostPercentage(totalCost: self.totalExpense, expenseList: self.expenseList)
             self.getLitersData(expenses: self.expenseList)
@@ -463,21 +468,21 @@ extension Category : CaseIterable{
     var label : String {
         switch self {
         case .fuel:
-            return "Fuel"
+            return NSLocalizedString("Fuel", comment: "")
         case .maintenance:
-            return "Maintenance"
+            return NSLocalizedString("Maintenance", comment: "")
         case .insurance:
-            return "Insurance"
+            return NSLocalizedString("Insurance", comment: "")
         case .roadTax:
-            return "Road tax"
+            return NSLocalizedString("Road tax", comment: "")
         case .tolls:
-            return "Tolls"
+            return NSLocalizedString("Tolls", comment: "")
         case .fines:
-            return "Fines"
+            return NSLocalizedString("Fines", comment: "")
         case .parking:
-            return "Parking"
+            return NSLocalizedString("Parking", comment: "")
         case .other:
-            return "Other"
+            return NSLocalizedString("Other", comment: "")
         }
     }
     

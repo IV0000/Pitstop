@@ -44,12 +44,14 @@ struct VehicleView: View {
             AddReportView(utilityVM: utilityVM , categoryVM: categoryVM, dataVM: dataVM, reminderVM: reminderVM)
         }
         .fullScreenCover(isPresented: $shouldShowOnboarding){
-            OnboardingView(onboardingVM: onboardingVM, dataVM: dataVM, shouldShowOnboarding: $shouldShowOnboarding)
+            OnboardingView(onboardingVM: onboardingVM, dataVM: dataVM, categoryVM: categoryVM, shouldShowOnboarding: $shouldShowOnboarding)
         }
         .onAppear{
             if(shouldShowOnboarding == false){
                 dataVM.getCurrentVehicle()
             }
+            homeVM.headerBackgroundColor = homeVM.loadColor(key: homeVM.COLOR_KEY)
+            homeVM.headerCardColor = homeVM.loadColor(key: homeVM.COLOR_KEY_CARD)
         }
         
     }
@@ -57,7 +59,7 @@ struct VehicleView: View {
 
 struct AddReportButton : View {
     
-    var text : String
+    var text : LocalizedStringKey
     var body: some View {
         
         ZStack{

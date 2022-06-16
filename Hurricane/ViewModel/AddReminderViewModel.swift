@@ -17,7 +17,7 @@ class AddReminderViewModel : ObservableObject {
     @Published var distance = ""
     @Published var date = Date.now
     
-    @Published var selectedCategory = "Maintenance"
+    @Published var selectedCategory = String(localized: "Maintenance")
     @Published var category : Int16 = Int16(Category.fuel.rawValue)
 
     //MARK: CATEGORY MISSING TO FIX
@@ -35,7 +35,7 @@ class AddReminderViewModel : ObservableObject {
         note = ""
         distance = ""
         category = 1
-        selectedCategory = "Maintenance"
+        selectedCategory = String(localized: "Maintenance")
         date = Date.now
     }
     

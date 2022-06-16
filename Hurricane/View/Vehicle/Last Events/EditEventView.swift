@@ -79,15 +79,16 @@ struct EditEventView: View {
             )
             .alert(isPresented:$showingAlert) {
                 Alert(
-                    title: Text("Are you sure you want to delete this?"),
-                    message: Text("There is no undo"),
-                    primaryButton: .destructive(Text("Delete")) {
+                    title: Text(String(localized: "Are you sure you want to delete this report?")),
+                    message: Text(String(localized: "This action cannot be undone")),
+                    primaryButton: .destructive(Text(String(localized: "Delete"))) {
                         dataVM.deleteExpense(expenseS: utilityVM.expenseToEdit)
                         dataVM.getExpensesCoreData(filter: nil, storage: { storage in
                             dataVM.expenseList = storage
                             dataVM.expenseFilteredList = storage
+                            categoryVM.retrieveAndUpdate(vehicleID: dataVM.currentVehicle.first!.vehicleID)
                         })
-//                       categoryVM.retrieveAndUpdate(vehicleID: dataVM.currentVehicle.first!.vehicleID)
+                       
                         
                         //SE METTO STA ROBA CRASHA, TO FIX PROSSIMAMENTE
                         //                            dataVM.getTotalExpense(expenses: dataVM.expenseList)
@@ -104,7 +105,7 @@ struct EditEventView: View {
 
 struct DeleteButton : View {
     
-    var title: String
+    var title: LocalizedStringKey
     
     var body: some View {
         ZStack{
@@ -138,7 +139,7 @@ struct FuelEventListFields: View {
             
             //MARK: AMOUNT
             HStack{
-                ListCategoryComponent(title: "Amount", iconName: "other", color: Palette.colorViolet)
+                ListCategoryComponent(title: String(localized: "Cost"), iconName: "other", color: Palette.colorViolet)
                 Spacer()
                 TextField("100", value: $utilityVM.expenseToEdit.price,formatter: NumberFormatter())
                     .font(Typography.headerM)
@@ -159,13 +160,13 @@ struct FuelEventListFields: View {
             
             //MARK: DATE
             DatePicker(selection: $utilityVM.expenseToEdit.date, displayedComponents: [.date]) {
-                ListCategoryComponent(title: "Day", iconName: "day", color: Palette.colorGreen)
+                ListCategoryComponent(title: String(localized: "Day"), iconName: "day", color: Palette.colorGreen)
             }
             .listRowInsets(EdgeInsets(top: 14, leading: 16, bottom: 14, trailing: 16))
             
             //MARK: ODOMETER
             HStack{
-                ListCategoryComponent(title: "Odometer", iconName: "odometer", color: Palette.colorBlue)
+                ListCategoryComponent(title: String(localized: "Odometer"), iconName: "odometer", color: Palette.colorBlue)
                 Spacer()
                 TextField(String(Int(dataVM.currentVehicle.first?.odometer ?? 0)), value: $utilityVM.expenseToEdit.odometer,formatter: NumberFormatter())
                     .font(Typography.headerM)
@@ -185,7 +186,7 @@ struct FuelEventListFields: View {
             
             //MARK: FUEL TYPE
             HStack{
-                ListCategoryComponent(title: "Fuel type", iconName: "fuelType", color: Palette.colorOrange)
+                ListCategoryComponent(title: String(localized: "Fuel type"), iconName: "fuelType", color: Palette.colorOrange)
                 Spacer()
                 Text((FuelType.init(rawValue: Int(utilityVM.expenseToEdit.fuelType ?? 0)) ?? .none).label)
             }
@@ -194,9 +195,7 @@ struct FuelEventListFields: View {
             //MARK: PRICE LITER
             HStack{
                 ListCategoryComponent(
-                    title: "Price/Liter",
-                    iconName: utilityVM.expenseToEdit.priceLiter == 0 ? "priceLiter" : "priceLiterColored",
-                    color:utilityVM.expenseToEdit.priceLiter == 0 ? Palette.greyLight : Palette.colorYellow)
+                    title: String(localized: "Price/Liter"),iconName: utilityVM.expenseToEdit.priceLiter == 0 ? "priceLiter" : "priceLiterColored",color:utilityVM.expenseToEdit.priceLiter == 0 ? Palette.greyLight : Palette.colorYellow)
                 Spacer()
                 TextField("0", value: $utilityVM.expenseToEdit.priceLiter,formatter: NumberFormatter())
                     .font(Typography.headerM)
@@ -215,9 +214,7 @@ struct FuelEventListFields: View {
             //MARK: LITER
             HStack{
                 ListCategoryComponent(
-                    title: "Liters",
-                    iconName: utilityVM.expenseToEdit.liters == 0 ? "liters" : "literColored",
-                    color: utilityVM.expenseToEdit.liters == 0 ? Palette.greyLight : Palette.colorOrange)
+                    title: String(localized: "Liters"),iconName: utilityVM.expenseToEdit.liters == 0 ? "liters" : "literColored", color: utilityVM.expenseToEdit.liters == 0 ? Palette.greyLight : Palette.colorOrange)
                 Spacer()
                 TextField("0", value: $utilityVM.expenseToEdit.liters,formatter: NumberFormatter())
                     .font(Typography.headerM)
@@ -234,11 +231,10 @@ struct FuelEventListFields: View {
             
             HStack{
                 ListCategoryComponent(
-                    title: "Note",
-                    iconName: utilityVM.expenseToEdit.note.isEmpty ? "note" : "noteColored",
+                    title: String(localized: "Note"), iconName: utilityVM.expenseToEdit.note.isEmpty ? "note" : "noteColored",
                     color: utilityVM.expenseToEdit.note.isEmpty ? Palette.greyLight : Palette.colorViolet)
                 Spacer()
-                TextField("Note", text: $utilityVM.expenseToEdit.note)
+                TextField(String(localized: "Note"), text: $utilityVM.expenseToEdit.note)
                     .font(Typography.headerM)
                     .foregroundColor(Palette.black)
                     .fixedSize(horizontal: true, vertical: true)
@@ -278,7 +274,7 @@ struct EventListFields: View {
     var body: some View {
         List{
             HStack{
-                ListCategoryComponent(title: "Amount", iconName: "other", color: Palette.colorViolet)
+                ListCategoryComponent(title: String(localized: "Cost"), iconName: "other", color: Palette.colorViolet)
                 Spacer()
                 TextField("100", value: $utilityVM.expenseToEdit.price,formatter: NumberFormatter())
                     .font(Typography.headerM)
@@ -299,13 +295,13 @@ struct EventListFields: View {
             
             //MARK: DATE
             DatePicker(selection: $utilityVM.expenseToEdit.date, displayedComponents: [.date]) {
-                ListCategoryComponent(title: "Day", iconName: "day", color: Palette.colorGreen)
+                ListCategoryComponent(title: String(localized: "Day"), iconName: "day", color: Palette.colorGreen)
             }
             .listRowInsets(EdgeInsets(top: 14, leading: 16, bottom: 14, trailing: 16))
             
             //MARK: ODOMETER
             HStack{
-                ListCategoryComponent(title: "Odometer", iconName: "odometer", color: Palette.colorBlue)
+                ListCategoryComponent(title: String(localized: "Odometer"), iconName: "odometer", color: Palette.colorBlue)
                 Spacer()
                 TextField(String(Int(dataVM.currentVehicle.first?.odometer ?? 0)), value: $utilityVM.expenseToEdit.odometer,formatter: NumberFormatter())
                     .font(Typography.headerM)
@@ -325,11 +321,10 @@ struct EventListFields: View {
             
             HStack{
                 ListCategoryComponent(
-                    title: "Note",
-                    iconName: utilityVM.expenseToEdit.note.isEmpty ? "note" : "noteColored",
+                    title: String(localized: "Note"),iconName: utilityVM.expenseToEdit.note.isEmpty ? "note" : "noteColored",
                     color: utilityVM.expenseToEdit.note.isEmpty ? Palette.greyLight : Palette.colorViolet)
                 Spacer()
-                TextField("Note", text: $utilityVM.expenseToEdit.note)
+                TextField(String(localized: "Note"), text: $utilityVM.expenseToEdit.note)
                     .font(Typography.headerM)
                     .foregroundColor(Palette.black)
                     .fixedSize(horizontal: true, vertical: true)
